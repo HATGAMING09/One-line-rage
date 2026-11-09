@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>One Go Line Puzzle - HAT GAMING09</title>
+<style>
+:root{--bg:linear-gradient(135deg,#0f172a,#1e293b);--glass:rgba(30,41,59,0.75);--border:rgba(255,255,255,0.1);--txt:#f8fafc;--muted:#94a3b8;--blue:#3b82f6;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--glow:rgba(59,130,246,0.45)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;touch-action:manipulation}
+.screen{width:95%;max-width:450px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:24px;padding:30px;box-shadow:0 15px 40px rgba(0,0,0,.5);display:none;flex-direction:column;align-items:center;text-align:center;animation:fi .35s ease}
+.screen.active{display:flex}
+@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+button{outline:none;-webkit-tap-highlight-color:transparent;cursor:pointer;font-family:inherit}
+#start-screen h1{font-size:.85em;color:var(--muted);margin-bottom:4px;letter-spacing:2px;text-transform:uppercase}
+#start-screen h2{font-size:2.3em;color:#fff;margin:0 0 36px;text-shadow:0 4px 15px rgba(0,0,0,.5)}
+.menu-btns{display:flex;flex-direction:column;gap:14px;width:100%}
+#play-btn{padding:15px;font-size:1.45em;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;border-radius:16px;box-shadow:0 8px 20px var(--glow);transition:all .2s}
+#play-btn:hover{transform:translateY(-3px);filter:brightness(1.15)}
+#about-btn{padding:13px;font-size:1.05em;font-weight:600;background:rgba(255,255,255,.1);color:#fff;border:1px solid var(--border);border-radius:14px;transition:all .2s}
+#about-btn:hover{background:rgba(255,255,255,.15);transform:translateY(-2px)}
+#lvl-screen h2{font-size:1.9em;font-weight:700;margin-bottom:18px}
+#lvl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:10px;width:100%;max-height:58vh;overflow-y:auto;padding:6px}
+#lvl-grid::-webkit-scrollbar{width:5px}
+#lvl-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.25);border-radius:5px}
+.lb{aspect-ratio:1;font-size:1.15em;font-weight:700;border-radius:12px;border:none;display:flex;justify-content:center;align-items:center;transition:all .2s}
+.lb.on{background:linear-gradient(135deg,#34d399,var(--green));color:#fff;box-shadow:0 4px 12px rgba(16,185,129,.3)}
+.lb.on:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 18px rgba(16,185,129,.5)}
+.lb.off{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid rgba(255,255,255,.05);cursor:not-allowed}
+.back-btn{margin-top:18px;padding:11px 28px;font-size:1em;font-weight:600;background:linear-gradient(135deg,#f87171,var(--red));color:#fff;border:none;border-radius:12px;box-shadow:0 4px 12px rgba(239,68,68,.35);transition:all .2s}
+.back-btn:hover{filter:brightness(1.1);transform:translateY(-2px)}
+#game-header{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+#lvl-disp{font-size:1.45em;font-weight:700}
+#gbts{display:flex;gap:10px;align-items:center}
+#gbts button{background:rgba(255,255,255,.1);color:#fff;border:1px solid var(--border);border-radius:12px;font-size:1.15em;display:inline-flex;justify-content:center;align-items:center;transition:all .2s;height:40px}
+#rst-btn{width:40px;border-radius:50%!important;background:var(--blue)!important;border:none!important;box-shadow:0 4px 10px var(--glow)}
+#rst-btn:hover{filter:brightness(1.2);transform:rotate(90deg)}
+#bk-btn{background:var(--red)!important;padding:0 13px;font-size:.9em;font-weight:600;border:none!important;border-radius:12px!important}
+#cv{display:block;background:rgba(15,23,42,.45);touch-action:none;border-radius:16px;width:100%;aspect-ratio:1;box-shadow:inset 0 8px 28px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.1);cursor:pointer}
+#cv.go{cursor:grabbing}
+#msg{margin-top:18px;font-size:1.15em;font-weight:700;min-height:1.4em;color:var(--green)}
+#about-screen h2{font-size:1.9em;color:var(--cyan);margin-bottom:10px}
+#about-screen p{font-size:.95em;line-height:1.65;margin-bottom:20px}
+.slinks{display:flex;flex-direction:column;gap:11px;width:100%;margin-bottom:20px}
+.slink{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;font-size:.95em;font-weight:700;color:#fff;border:none;border-radius:13px;text-decoration:none;transition:all .2s;box-shadow:0 5px 14px rgba(0,0,0,.3)}
+.slink.yt{background:linear-gradient(135deg,#ff0000,#cc0000)}
+.slink.tg{background:linear-gradient(135deg,#0088cc,#005580)}
+.slink:hover{transform:translateY(-3px);filter:brightness(1.15)}
+</style>
+</head>
+<body>
+<div id="start-screen" class="screen active">
+  <h1>Developed by HAT GAMING09</h1>
+  <h2>One Line Puzzle</h2>
+  <div class="menu-btns">
+    <button id="play-btn">PLAY GAME</button>
+    <button id="about-btn">ABOUT ME</button>
+  </div>
+</div>
+
+<div id="lvl-screen" class="screen">
+  <h2>Select Level</h2>
+  <div id="lvl-grid"></div>
+  <button class="back-btn" id="bk-start">Back to Menu</button>
+</div>
+
+<div id="game-screen" class="screen">
+  <div id="game-header">
+    <span id="lvl-disp">LEVEL 1</span>
+    <div id="gbts">
+      <button id="rst-btn" title="Restart">↻</button>
+      <button id="bk-btn">← Back</button>
+    </div>
+  </div>
+  <canvas id="cv" width="400" height="400"></canvas>
+  <div id="msg"></div>
+</div>
+
+<div id="about-screen" class="screen">
+  <h2>About Me</h2>
+  <p>Hey! I am <strong>HAT GAMING09</strong>, the creator of One Go Line Puzzle. Welcome to my official gaming platform!</p>
+  <div class="slinks">
+    <a href="https://youtube.com/@hatgaming09" target="_blank" class="slink yt">📺 YouTube Channel</a>
+    <a href="https://t.me/hatgaming09" target="_blank" class="slink tg">✈️ Telegram Channel</a>
+  </div>
+  <button class="back-btn" id="bk-about">Back to Menu</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// LEVEL DEFINITIONS — all mathematically verified at runtime
+// ═══════════════════════════════════════════════════════════════
+const poly=(n,r=38,cx=50,cy=50,a0=0)=>
+  Array.from({length:n},(_,i)=>({
+    x:+(cx+r*Math.cos(2*Math.PI*i/n-Math.PI/2+a0)).toFixed(2),
+    y:+(cy+r*Math.sin(2*Math.PI*i/n-Math.PI/2+a0)).toFixed(2)
+  }));
+const ring=n=>Array.from({length:n},(_,i)=>[i,(i+1)%n]);
+const star=(n,k)=>Array.from({length:n},(_,i)=>[i,(i+k)%n]);
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+
+// Euler verifier — returns true only if path/circuit exists
+function ok(pts,segs){
+  const n=pts.length, deg=new Array(n).fill(0);
+  segs.forEach(([a,b])=>{deg[a]++;deg[b]++;});
+  const odd=deg.filter(d=>d%2!==0).length;
+  if(odd!==0&&odd!==2)return false;
+  const adj=Array.from({length:n},()=>[]), act=new Set();
+  segs.forEach(([a,b])=>{adj[a].push(b);adj[b].push(a);act.add(a);act.add(b);});
+  if(!act.size)return false;
+  const s=[...act][0], vis=new Set([s]), q=[s];
+  while(q.length){const u=q.shift();for(const v of adj[u])if(!vis.has(v)){vis.add(v);q.push(v);}}
+  return[...act].every(v=>vis.has(v));
+}
+
+function make(pts,segs){
+  if(!ok(pts,segs)){console.warn('LEVEL FAILED EULER CHECK — skipped');return null;}
+  return{pts,segs};
+}
+
+// ── 60 levels, all pass ok() ────────────────────────────────────
+const RAW=[
+  // 1 – triangle
+  make(poly(3,38),ring(3)),
+  // 2 – square
+  make(poly(4,38),ring(4)),
+  // 3 – pentagon
+  make(poly(5,38),ring(5)),
+  // 4 – {5/2} star
+  make(poly(5,38),star(5,2)),
+  // 5 – hexagon
+  make(poly(6,38),ring(6)),
+  // 6 – square + 1 diagonal  N0,N2 odd ✓
+  make([{x:15,y:15},{x:85,y:15},{x:85,y:85},{x:15,y:85}],
+       [[0,1],[1,2],[2,3],[3,0],[0,2]]),
+  // 7 – kite  N0,N3 odd ✓
+  make([{x:50,y:10},{x:15,y:85},{x:85,y:85},{x:50,y:55}],
+       [[0,1],[1,2],[2,0],[0,3],[1,3]]),
+  // 8 – diamond + centre  N0,N2 odd ✓
+  make([{x:50,y:10},{x:90,y:50},{x:50,y:90},{x:10,y:50},{x:50,y:50}],
+       [[0,1],[1,2],[2,3],[3,0],[0,4],[2,4]]),
+  // 9 – Z path  N0,N3 odd ✓
+  make([{x:15,y:15},{x:85,y:15},{x:15,y:85},{x:85,y:85}],
+       [[0,1],[1,2],[2,3]]),
+  // 10 – heptagon
+  make(poly(7,38),ring(7)),
+  // 11 – house  N1,N4 odd ✓
+  make([{x:50,y:10},{x:85,y:42},{x:85,y:85},{x:15,y:85},{x:15,y:42}],
+       [[0,1],[1,2],[2,3],[3,4],[4,0],[1,4]]),
+  // 12 – figure-8 circuit  all even ✓
+  make([{x:50,y:50},{x:22,y:22},{x:78,y:22},{x:22,y:78},{x:78,y:78}],
+       [[0,1],[1,2],[2,0],[0,3],[3,4],[4,0]]),
+  // 13 – ladder  N2,N3 odd ✓
+  make([{x:20,y:15},{x:80,y:15},{x:80,y:50},{x:20,y:50},{x:20,y:85},{x:80,y:85}],
+       [[0,1],[1,2],[3,2],[3,0],[2,5],[3,4],[4,5]]),
+  // 14 – octagon
+  make(poly(8,38),ring(8)),
+  // 15 – domino  N1,N2 odd ✓
+  make([{x:12,y:30},{x:50,y:30},{x:50,y:70},{x:12,y:70},{x:88,y:30},{x:88,y:70}],
+       [[0,1],[1,2],[2,3],[3,0],[1,4],[4,5],[5,2]]),
+  // 16 – {7/2}
+  make(poly(7,38),star(7,2)),
+  // 17 – {7/3}
+  make(poly(7,38),star(7,3)),
+  // 18 – rect + diagonal  N0,N2 odd ✓
+  make([{x:15,y:25},{x:85,y:25},{x:85,y:75},{x:15,y:75}],
+       [[0,1],[1,2],[2,3],[3,0],[0,2]]),
+  // 19 – arrow  N2,N3 odd ✓
+  make([{x:50,y:10},{x:85,y:40},{x:65,y:80},{x:35,y:80},{x:15,y:40}],
+       [[0,1],[1,2],[2,3],[3,4],[4,0],[0,2],[0,3]]),
+  // 20 – double-triangle  N1,N3 odd ✓
+  // N0:4 N1:3 N2:2 N3:3 N4:2  → 2 odd ✓
+  make([{x:50,y:50},{x:15,y:15},{x:85,y:15},{x:15,y:85},{x:85,y:85}],
+       [[0,1],[1,2],[2,0],[0,3],[3,4],[4,0],[1,4]]),
+  // 21 – nonagon
+  make(poly(9,38),ring(9)),
+  // 22 – {8/3}
+  make(poly(8,38),star(8,3)),
+  // 23 – T-shape  N0,N1 odd ✓
+  make([{x:50,y:10},{x:50,y:50},{x:15,y:50},{x:85,y:50},{x:50,y:85}],
+       [[0,1],[1,2],[1,3],[2,4],[3,4]]),
+  // 24 – decagon
+  make(poly(10,38),ring(10)),
+  // 25 – {9/2}
+  make(poly(9,38),star(9,2)),
+  // 26 – {9/4}
+  make(poly(9,38),star(9,4)),
+  // 27 – {10/3}
+  make(poly(10,38),star(10,3)),
+  // 28 – 11-gon
+  make(poly(11,38),ring(11)),
+  // 29 – {11/2}
+  make(poly(11,38),star(11,2)),
+  // 30 – {11/3}
+  make(poly(11,38),star(11,3)),
+  // 31 – 12-gon
+  make(poly(12,38),ring(12)),
+  // 32 – {11/4}
+  make(poly(11,38),star(11,4)),
+  // 33 – {11/5}
+  make(poly(11,38),star(11,5)),
+  // 34 – {12/5}
+  make(poly(12,38),star(12,5)),
+  // 35 – {13/2}
+  make(poly(13,38),star(13,2)),
+  // 36 – {13/3}
+  make(poly(13,38),star(13,3)),
+  // 37 – {13/4}
+  make(poly(13,38),star(13,4)),
+  // 38 – {13/5}
+  make(poly(13,38),star(13,5)),
+  // 39 – {13/6}
+  make(poly(13,38),star(13,6)),
+  // 40 – 14-gon
+  make(poly(14,38),ring(14)),
+  // 41 – {14/3}
+  make(poly(14,38),star(14,3)),
+  // 42 – {14/5}
+  make(poly(14,38),star(14,5)),
+  // 43 – 15-gon
+  make(poly(15,38),ring(15)),
+  // 44 – {15/4}
+  make(poly(15,38),star(15,4)),
+  // 45 – {15/7}
+  make(poly(15,38),star(15,7)),
+  // 46 – {16/3}
+  make(poly(16,38),star(16,3)),
+  // 47 – {16/5}
+  make(poly(16,38),star(16,5)),
+  // 48 – {16/7}
+  make(poly(16,38),star(16,7)),
+  // 49 – {17/2}
+  make(poly(17,38),star(17,2)),
+  // 50 – {17/4}
+  make(poly(17,38),star(17,4)),
+  // 51 – {17/6}
+  make(poly(17,38),star(17,6)),
+  // 52 – {17/8}
+  make(poly(17,38),star(17,8)),
+  // 53 – {18/5}
+  make(poly(18,38),star(18,5)),
+  // 54 – {18/7}
+  make(poly(18,38),star(18,7)),
+  // 55 – {19/2}
+  make(poly(19,38),star(19,2)),
+  // 56 – {19/4}
+  make(poly(19,38),star(19,4)),
+  // 57 – {19/6}
+  make(poly(19,38),star(19,6)),
+  // 58 – {19/8}
+  make(poly(19,38),star(19,8)),
+  // 59 – {20/7}
+  make(poly(20,38),star(20,7)),
+  // 60 – {20/9}
+  make(poly(20,38),star(20,9)),
+].filter(Boolean);
+
+const LEVELS=RAW;
+const TOTAL=LEVELS.length;
+const SKEY='hatg09_v4';
+
+// ═══════════════════════════════════════════════════════════════
+// GAME ENGINE — completely rewritten move detection
+// KEY FIX: instead of "am I on a valid path?",
+// we ask "which undrawn segment am I closest to, FROM current node?"
+// and only fail if I'm clearly off ALL of them AND far from current node.
+// ═══════════════════════════════════════════════════════════════
+const cv=document.getElementById('cv');
+const ctx=cv.getContext('2d');
+const msgEl=document.getElementById('msg');
+const ldEl=document.getElementById('lvl-disp');
+const lgEl=document.getElementById('lvl-grid');
+
+// ── Audio ──────────────────────────────────────────────────────
+let AC=null;
+function initAC(){if(!AC)try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+function beep(f,t,d,v=0.08){
+  if(!AC)return;
+  try{const o=AC.createOscillator(),g=AC.createGain();
+  o.type=t;o.frequency.value=f;
+  g.gain.setValueAtTime(v,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.00001,AC.currentTime+d);
+  o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d);}catch(e){}
+}
+const sNode=()=>beep(600,'sine',0.07);
+const sWin=()=>{beep(523,'triangle',0.1,.14);setTimeout(()=>beep(659,'triangle',0.12,.14),110);setTimeout(()=>beep(1047,'triangle',0.28,.18),230);};
+const sFail=()=>beep(130,'sawtooth',0.22,.13);
+
+// ── State ──────────────────────────────────────────────────────
+let SCR='start', LVL=null, LI=0;
+let sx=1,sy=1,SP=[];          // scaled points
+let DRAWN=[],VISITED=[],CURPT=null,DRAWING=false,FAILED=false;
+
+// ── Helpers ────────────────────────────────────────────────────
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+
+function ptSegDist(p,a,b){
+  const dx=b.x-a.x, dy=b.y-a.y, l2=dx*dx+dy*dy;
+  if(l2<0.0001)return dist(p,a);
+  const t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/l2));
+  return dist(p,{x:a.x+t*dx,y:a.y+t*dy});
+}
+
+function segDrawn(a,b){
+  const k=Math.min(a,b)+'-'+Math.max(a,b);
+  return DRAWN.some(([u,v])=>Math.min(u,v)+'-'+Math.max(u,v)===k);
+}
+
+// ── Canvas resize ──────────────────────────────────────────────
+function resize(){
+  if(SCR!=='game-screen')return;
+  const gs=document.getElementById('game-screen');
+  const s=Math.max(220,gs.clientWidth-60);
+  cv.width=s;cv.height=s;sx=s/100;sy=s/100;
+  if(LVL){SP=LVL.pts.map(p=>({x:p.x*sx,y:p.y*sy}));draw();}
+}
+
+// ── Draw ───────────────────────────────────────────────────────
+const NR=()=>Math.max(10,13*sx);   // node radius scales with canvas
+
+function draw(){
+  if(SCR!=='game-screen'||!LVL)return;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const nr=NR();
+
+  // bg segments
+  LVL.segs.forEach(([a,b])=>{
+    if(segDrawn(a,b))return;
+    ctx.beginPath();ctx.moveTo(SP[a].x,SP[a].y);ctx.lineTo(SP[b].x,SP[b].y);
+    ctx.strokeStyle='rgba(148,163,184,0.18)';ctx.lineWidth=3.5*sx;ctx.lineCap='round';ctx.stroke();
+  });
+
+  // bg nodes
+  SP.forEach((p,i)=>{
+    const isCur=VISITED.length>0&&VISITED[VISITED.length-1]===i;
+    const col=isCur?'rgba(59,130,246,0.85)':'rgba(148,163,184,0.4)';
+    const r=isCur?nr*0.85:nr*0.6;
+    ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);
+    ctx.fillStyle=col;ctx.fill();
+    ctx.beginPath();ctx.arc(p.x,p.y,r*0.3,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.8)';ctx.fill();
+  });
+
+  // drawn segments
+  DRAWN.forEach(([a,b])=>{
+    ctx.shadowColor='rgba(6,182,212,0.8)';ctx.shadowBlur=12;
+    ctx.beginPath();ctx.moveTo(SP[a].x,SP[a].y);ctx.lineTo(SP[b].x,SP[b].y);
+    ctx.strokeStyle='#06b6d4';ctx.lineWidth=7*sx;ctx.lineCap='round';ctx.stroke();
+    ctx.shadowBlur=0;ctx.shadowColor='transparent';
+  });
+
+  // live segment
+  if(DRAWING&&CURPT&&VISITED.length>0){
+    const lp=SP[VISITED[VISITED.length-1]];
+    ctx.shadowColor='rgba(6,182,212,0.7)';ctx.shadowBlur=10;
+    ctx.beginPath();ctx.moveTo(lp.x,lp.y);ctx.lineTo(CURPT.x,CURPT.y);
+    ctx.strokeStyle='#06b6d4';ctx.lineWidth=7*sx;ctx.lineCap='round';ctx.stroke();
+    ctx.shadowBlur=0;ctx.shadowColor='transparent';
+  }
+}
+
+// ── Level management ───────────────────────────────────────────
+function getU(){return parseInt(localStorage.getItem(SKEY)||'1',10);}
+function setU(n){const u=getU();if(n>u)localStorage.setItem(SKEY,String(n));}
+
+function showScr(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  SCR=id;
+}
+
+function buildGrid(){
+  lgEl.innerHTML='';
+  const u=getU();
+  for(let i=0;i<TOTAL;i++){
+    const b=document.createElement('button');
+    b.className='lb '+(i+1<=u?'on':'off');
+    b.textContent=i+1<=u?i+1:'🔒';
+    if(i+1<=u)b.addEventListener('click',()=>{initAC();go(i);});
+    lgEl.appendChild(b);
+  }
+}
+
+function go(i){
+  LI=i;LVL=LEVELS[i];
+  ldEl.textContent='LEVEL '+(i+1);
+  showScr('game-screen');resize();reset();
+}
+
+function reset(){
+  DRAWING=false;FAILED=false;DRAWN=[];VISITED=[];CURPT=null;
+  cv.classList.remove('go');
+  msgEl.textContent='';msgEl.style.color='var(--green)';
+  if(LVL){SP=LVL.pts.map(p=>({x:p.x*sx,y:p.y*sy}));draw();}
+}
+
+function fail(){
+  FAILED=true;DRAWING=false;cv.classList.remove('go');
+  msgEl.textContent='Oops! Try again ✕';msgEl.style.color='var(--red)';
+  sFail();draw();setTimeout(reset,800);
+}
+
+function win(){
+  msgEl.textContent='Level Complete! 🎉';msgEl.style.color='var(--green)';
+  sWin();DRAWING=false;cv.classList.remove('go');
+  setU(LI+2);draw();
+  setTimeout(()=>{buildGrid();showScr('lvl-screen');},1400);
+}
+
+// ── Input ──────────────────────────────────────────────────────
+function pos(e){
+  const r=cv.getBoundingClientRect(),s=e.touches?e.touches[0]:e;
+  return{x:s.clientX-r.left,y:s.clientY-r.top};
+}
+
+// ══════════════════════════════════════════════════════════════
+// CORE ENGINE FIX — rewritten move logic
+//
+// Old (broken) approach:
+//   Loop segments → find first one cursor is near → break
+//   Problem: centre node has 4+ segments, wrong one gets picked first
+//
+// New (correct) approach:
+//   1. Collect ALL undrawn segments from current node
+//   2. For each, compute cursor's distance to that segment
+//   3. Pick the CLOSEST one (not just first)
+//   4. If closest distance > threshold AND cursor far from node → fail
+//   5. If cursor reached far end of chosen segment → snap to next node
+// ══════════════════════════════════════════════════════════════
+
+function onDown(e){
+  e.preventDefault();initAC();
+  if(SCR!=='game-screen'||!LVL||FAILED)return;
+  if(DRAWING)return;
+  const p=pos(e);
+  // Find nearest node
+  let best=-1,bd=Infinity;
+  SP.forEach((q,i)=>{const d=dist(p,q);if(d<bd){bd=d;best=i;}});
+  const nr=NR();
+  if(best!==-1&&bd<nr*2){
+    DRAWING=true;FAILED=false;VISITED=[best];DRAWN=[];CURPT=p;
+    cv.classList.add('go');msgEl.textContent='';draw();
+  }
+}
+
+function onMove(e){
+  e.preventDefault();
+  if(!DRAWING||SCR!=='game-screen'||FAILED)return;
+  CURPT=pos(e);
+  const nr=NR();
+  const last=VISITED[VISITED.length-1];
+  const lp=SP[last];
+
+  // ── Collect all undrawn segments from current node ──────────
+  const candidates=[];
+  for(const [a,b] of LVL.segs){
+    let next=-1;
+    if(a===last&&!segDrawn(a,b))next=b;
+    else if(b===last&&!segDrawn(a,b))next=a;
+    if(next!==-1)candidates.push({next,a,b});
+  }
+
+  // ── If no moves left from here, only fail if user moves away ─
+  if(candidates.length===0){
+    if(dist(CURPT,lp)>nr*2)fail();
+    else draw();
+    return;
+  }
+
+  // ── Find closest candidate segment ──────────────────────────
+  let bestSeg=null, bestDist=Infinity;
+  for(const c of candidates){
+    const d=ptSegDist(CURPT,lp,SP[c.next]);
+    if(d<bestDist){bestDist=d;bestSeg=c;}
+  }
+
+  // ── Threshold: generous so fast swipes don't break ───────────
+  const threshold=nr*2.2;
+
+  if(bestDist>threshold&&dist(CURPT,lp)>nr*1.5){
+    fail();return;
+  }
+
+  // ── Check if cursor reached the next node ────────────────────
+  if(bestSeg&&dist(CURPT,SP[bestSeg.next])<nr*1.6){
+    DRAWN.push([last,bestSeg.next]);
+    VISITED.push(bestSeg.next);
+    sNode();
+    if(DRAWN.length===LVL.segs.length){win();return;}
+  }
+
+  draw();
+}
+
+function onUp(e){
+  e.preventDefault();
+  if(!DRAWING||SCR!=='game-screen'||FAILED)return;
+  DRAWING=false;cv.classList.remove('go');CURPT=null;
+  // Only win if all segments drawn; otherwise silent reset (no fail on lift)
+  if(DRAWN.length===LVL.segs.length)win();
+  else{
+    // Gentle: just reset without "fail" sound — lets player retry without frustration
+    setTimeout(reset,300);
+  }
+  draw();
+}
+
+function onCancel(e){
+  e.preventDefault();
+  DRAWING=false;cv.classList.remove('go');CURPT=null;draw();
+  setTimeout(reset,300);
+}
+
+cv.addEventListener('mousedown',onDown);
+cv.addEventListener('mousemove',onMove);
+cv.addEventListener('mouseup',onUp);
+cv.addEventListener('mouseleave',onUp);
+cv.addEventListener('touchstart',onDown,{passive:false});
+cv.addEventListener('touchmove',onMove,{passive:false});
+cv.addEventListener('touchend',onUp,{passive:false});
+cv.addEventListener('touchcancel',onCancel,{passive:false});
+
+document.getElementById('play-btn').addEventListener('click',()=>{initAC();buildGrid();showScr('lvl-screen');});
+document.getElementById('about-btn').addEventListener('click',()=>{initAC();showScr('about-screen');});
+document.getElementById('bk-start').addEventListener('click',()=>showScr('start-screen'));
+document.getElementById('bk-about').addEventListener('click',()=>showScr('start-screen'));
+document.getElementById('bk-btn').addEventListener('click',()=>{
+  DRAWING=false;cv.classList.remove('go');buildGrid();showScr('lvl-screen');
+});
+document.getElementById('rst-btn').addEventListener('click',()=>{
+  if(SCR==='game-screen'&&LVL)reset();
+});
+window.addEventListener('resize',resize);
+showScr('start-screen');
+</script>
+</body>
+</html>
